@@ -21,7 +21,7 @@
 *
 */
 
-//#define LOG_NDEBUG 0
+// #define LOG_NDEBUG 1
 
 #define LOG_TAG "CameraWrapper"
 #include <cutils/log.h>
@@ -102,14 +102,19 @@ static char *camera_fixup_getparams(int id, const char *settings)
     android::CameraParameters params;
     params.unflatten(android::String8(settings));
 
-    params.set("max-saturation", "10");
-    params.set("max-contrast", "10");
-    params.set("max-sharpness", "10");
-
 #if !LOG_NDEBUG
     ALOGV("%s: original parameters:", __FUNCTION__);
     params.dump();
 #endif
+
+    params.set("max-saturation", "10");
+    params.set("max-contrast", "10");
+    params.set("max-sharpness", "10");
+
+    /* Face detection */
+    params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_HW, "0");
+    params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_SW, "0");
+    params.set(android::CameraParameters::KEY_FACE_DETECTION, "off");
 
 #if !LOG_NDEBUG
     ALOGV("%s: fixed parameters:", __FUNCTION__);
@@ -138,6 +143,10 @@ char * camera_fixup_setparams(struct camera_device * device, const char * settin
     if (isVideo) {
         params.set(android::CameraParameters::KEY_ROTATION, "0");
     }
+    /* Face detection */
+    params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_HW, "0");
+    params.set(android::CameraParameters::KEY_MAX_NUM_DETECTED_FACES_SW, "0");
+    params.set(android::CameraParameters::KEY_FACE_DETECTION, "off");
 
 #if !LOG_NDEBUG
     ALOGV("%s: fixed parameters:", __FUNCTION__);
